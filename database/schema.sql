@@ -1,99 +1,90 @@
--- EmptyMiles database schema (MySQL 8+)
--- Run this once in MySQL Workbench or: mysql -u root -p < database/schema.sql
-
-CREATE DATABASE IF NOT EXISTS emptymiles CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE emptymiles;
+-- EmptyMiles database schema (PostgreSQL)
+--
+-- In pgAdmin 4:
+--   1. Right-click Databases > Create > Database..., name it: emptymiles
+--   2. Select the emptymiles database, open Tools > Query Tool
+--   3. Open this file (or paste it) and press Execute (F5)
 
 -- Customers and delivery partners
 CREATE TABLE IF NOT EXISTS users (
-    id          INT AUTO_INCREMENT PRIMARY KEY,
+    id          SERIAL PRIMARY KEY,
     name        VARCHAR(100) NOT NULL,
     email       VARCHAR(150) NOT NULL UNIQUE,
     phone       VARCHAR(15)  NOT NULL,
     password    VARCHAR(255) NOT NULL,              -- salted PBKDF2 hash, never plain text
-    role        ENUM('CUSTOMER', 'PARTNER') NOT NULL,
-    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    role        VARCHAR(10)  NOT NULL CHECK (role IN ('CUSTOMER', 'PARTNER')),
+    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Vehicles owned by delivery partners
 CREATE TABLE IF NOT EXISTS vehicles (
-    id                     INT AUTO_INCREMENT PRIMARY KEY,
-    partner_id             INT NOT NULL,
-    vehicle_type           ENUM('BIKE', 'AUTO', 'TRUCK') NOT NULL,
+    id                     SERIAL PRIMARY KEY,
+    partner_id             INT NOT NULL REFERENCES users (id),
+    vehicle_type           VARCHAR(10) NOT NULL CHECK (vehicle_type IN ('BIKE', 'AUTO', 'TRUCK')),
     vehicle_number         VARCHAR(20) NOT NULL UNIQUE,
-    total_capacity         DECIMAL(10, 2) NOT NULL,          -- kg
-    current_load           DECIMAL(10, 2) NOT NULL DEFAULT 0, -- kg
-    available_capacity     DECIMAL(10, 2) NOT NULL,          -- total_capacity - current_load
-    status                 ENUM('AVAILABLE', 'BUSY', 'OFFLINE') NOT NULL DEFAULT 'OFFLINE',
-    current_latitude       DECIMAL(10, 7),
-    current_longitude      DECIMAL(10, 7),
+    total_capacity         NUMERIC(10, 2) NOT NULL,          -- kg
+    current_load           NUMERIC(10, 2) NOT NULL DEFAULT 0, -- kg
+    available_capacity     NUMERIC(10, 2) NOT NULL,          -- total_capacity - current_load
+    status                 VARCHAR(10) NOT NULL DEFAULT 'OFFLINE' CHECK (status IN ('AVAILABLE', 'BUSY', 'OFFLINE')),
+    current_latitude       NUMERIC(10, 7),
+    current_longitude      NUMERIC(10, 7),
     destination            VARCHAR(255),                     -- where the vehicle is heading (optional)
-    destination_latitude   DECIMAL(10, 7),
-    destination_longitude  DECIMAL(10, 7),
-    updated_at             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_vehicle_partner FOREIGN KEY (partner_id) REFERENCES users (id),
-    INDEX idx_vehicle_status (status)
+    destination_latitude   NUMERIC(10, 7),
+    destination_longitude  NUMERIC(10, 7)
 );
+CREATE INDEX IF NOT EXISTS idx_vehicle_status ON vehicles (status);
 
 -- Goods a customer wants to send
 CREATE TABLE IF NOT EXISTS shipments (
-    id                     INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id            INT NOT NULL,
+    id                     SERIAL PRIMARY KEY,
+    customer_id            INT NOT NULL REFERENCES users (id),
     pickup_address         VARCHAR(255) NOT NULL,
-    pickup_latitude        DECIMAL(10, 7) NOT NULL,
-    pickup_longitude       DECIMAL(10, 7) NOT NULL,
+    pickup_latitude        NUMERIC(10, 7) NOT NULL,
+    pickup_longitude       NUMERIC(10, 7) NOT NULL,
     destination_address    VARCHAR(255) NOT NULL,
-    destination_latitude   DECIMAL(10, 7) NOT NULL,
-    destination_longitude  DECIMAL(10, 7) NOT NULL,
+    destination_latitude   NUMERIC(10, 7) NOT NULL,
+    destination_longitude  NUMERIC(10, 7) NOT NULL,
     product_name           VARCHAR(100) NOT NULL,
     product_type           VARCHAR(50)  NOT NULL,
     quantity               INT NOT NULL,
-    weight                 DECIMAL(10, 2) NOT NULL,          -- total kg
+    weight                 NUMERIC(10, 2) NOT NULL,          -- total kg
     status                 VARCHAR(30) NOT NULL DEFAULT 'REQUESTED',
-    created_at             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_shipment_customer FOREIGN KEY (customer_id) REFERENCES users (id)
+    created_at             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- A shipment assigned to one partner's vehicle
 CREATE TABLE IF NOT EXISTS bookings (
-    id              INT AUTO_INCREMENT PRIMARY KEY,
-    shipment_id     INT NOT NULL,
-    customer_id     INT NOT NULL,
-    partner_id      INT NOT NULL,
-    vehicle_id      INT NOT NULL,
+    id              SERIAL PRIMARY KEY,
+    shipment_id     INT NOT NULL REFERENCES shipments (id),
+    customer_id     INT NOT NULL REFERENCES users (id),
+    partner_id      INT NOT NULL REFERENCES users (id),
+    vehicle_id      INT NOT NULL REFERENCES vehicles (id),
     status          VARCHAR(30) NOT NULL,
-    match_score     DECIMAL(5, 2) NOT NULL,
-    estimated_cost  DECIMAL(10, 2) NOT NULL,
+    match_score     NUMERIC(5, 2) NOT NULL,
+    estimated_cost  NUMERIC(10, 2) NOT NULL,
     created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     pickup_time     TIMESTAMP NULL,
-    delivery_time   TIMESTAMP NULL,
-    CONSTRAINT fk_booking_shipment FOREIGN KEY (shipment_id) REFERENCES shipments (id),
-    CONSTRAINT fk_booking_customer FOREIGN KEY (customer_id) REFERENCES users (id),
-    CONSTRAINT fk_booking_partner  FOREIGN KEY (partner_id)  REFERENCES users (id),
-    CONSTRAINT fk_booking_vehicle  FOREIGN KEY (vehicle_id)  REFERENCES vehicles (id),
-    INDEX idx_booking_status (status)
+    delivery_time   TIMESTAMP NULL
 );
+CREATE INDEX IF NOT EXISTS idx_booking_status ON bookings (status);
 
 -- GPS points sent by the partner's browser during a delivery
 CREATE TABLE IF NOT EXISTS vehicle_locations (
-    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
-    vehicle_id   INT NOT NULL,
-    booking_id   INT NULL,
-    latitude     DECIMAL(10, 7) NOT NULL,
-    longitude    DECIMAL(10, 7) NOT NULL,
-    recorded_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_location_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles (id),
-    CONSTRAINT fk_location_booking FOREIGN KEY (booking_id) REFERENCES bookings (id),
-    INDEX idx_location_booking (booking_id, recorded_at)
+    id           BIGSERIAL PRIMARY KEY,
+    vehicle_id   INT NOT NULL REFERENCES vehicles (id),
+    booking_id   INT NULL REFERENCES bookings (id),
+    latitude     NUMERIC(10, 7) NOT NULL,
+    longitude    NUMERIC(10, 7) NOT NULL,
+    recorded_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX IF NOT EXISTS idx_location_booking ON vehicle_locations (booking_id, recorded_at);
 
 -- OTP the customer gives the partner at the destination
 CREATE TABLE IF NOT EXISTS delivery_otps (
-    id           INT AUTO_INCREMENT PRIMARY KEY,
-    booking_id   INT NOT NULL UNIQUE,
+    id           SERIAL PRIMARY KEY,
+    booking_id   INT NOT NULL UNIQUE REFERENCES bookings (id),
     otp          VARCHAR(6) NOT NULL,
     verified     BOOLEAN NOT NULL DEFAULT FALSE,
     created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    verified_at  TIMESTAMP NULL,
-    CONSTRAINT fk_otp_booking FOREIGN KEY (booking_id) REFERENCES bookings (id)
+    verified_at  TIMESTAMP NULL
 );

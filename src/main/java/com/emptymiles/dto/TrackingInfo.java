@@ -44,7 +44,7 @@ public class TrackingInfo {
                 + ",\"statusLabel\":\"" + status.getLabel() + "\""
                 + ",\"latitude\":" + latitude
                 + ",\"longitude\":" + longitude
-                + ",\"lastUpdated\":" + (lastUpdated == null ? "null" : "\"" + lastUpdated.toString().replace('T', ' ') + "\"")
+                + ",\"lastUpdated\":" + (lastUpdated == null ? "null" : "\"" + lastUpdated.withNano(0).toString().replace('T', ' ') + "\"")
                 + ",\"distanceToPickupKm\":" + distanceToPickupKm
                 + ",\"distanceToDestinationKm\":" + distanceToDestinationKm
                 + "}";

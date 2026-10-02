@@ -10,7 +10,7 @@ import com.emptymiles.model.enums.VehicleStatus;
 import com.emptymiles.model.enums.VehicleType;
 import com.emptymiles.util.ValidationUtil;
 
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.SQLException;
 import java.util.List;
 
 /** Vehicle registration, availability, location, route and load for delivery partners. */
@@ -49,7 +49,8 @@ public class VehicleService {
         try {
             v.setId(vehicleDAO.create(v));
         } catch (DataAccessException e) {
-            if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
+            // SQLState 23xxx = integrity constraint violation (here: duplicate vehicle_number)
+            if (e.getCause() instanceof SQLException sql && sql.getSQLState() != null && sql.getSQLState().startsWith("23")) {
                 throw new ValidationException("A vehicle with number " + v.getVehicleNumber() + " is already registered.");
             }
             throw e;

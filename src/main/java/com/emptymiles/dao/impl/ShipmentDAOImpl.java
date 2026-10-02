@@ -10,7 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class ShipmentDAOImpl implements ShipmentDAO {
                 + "destination_address, destination_latitude, destination_longitude, product_name, product_type, "
                 + "quantity, weight, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = con.prepareStatement(sql, new String[] {"id"})) {
             ps.setInt(1, s.getCustomerId());
             ps.setString(2, s.getPickupAddress());
             ps.setDouble(3, s.getPickupLatitude());

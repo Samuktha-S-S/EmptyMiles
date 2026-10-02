@@ -1,6 +1,5 @@
--- Demo data for EmptyMiles (Chennai locations). Run after schema.sql.
+-- Demo data for EmptyMiles (Chennai locations). Run after schema.sql, in pgAdmin's Query Tool on the emptymiles database.
 -- Every demo account uses the password:  password123
-USE emptymiles;
 
 INSERT INTO users (name, email, phone, password, role) VALUES
 ('Priya Customer',  'customer@emptymiles.com', '9876500001', '65536:ceAzFwS7ldIh/GamyZ7ENQ==:YefubfRfGuFQFeZkLwOREw2FOpsY6PjUNiw2H4cySbY=', 'CUSTOMER'),

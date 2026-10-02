@@ -37,7 +37,7 @@ public final class DBConnection {
                     PROPS.getProperty("db.username"),
                     PROPS.getProperty("db.password"));
         } catch (SQLException e) {
-            throw new DataAccessException("Cannot connect to MySQL. Check db.properties and that MySQL is running.", e);
+            throw new DataAccessException("Cannot connect to PostgreSQL. Check db.properties and that PostgreSQL is running.", e);
         }
     }
 }

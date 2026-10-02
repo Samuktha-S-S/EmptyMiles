@@ -11,7 +11,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class VehicleDAOImpl implements VehicleDAO {
                 + "available_capacity, status, current_latitude, current_longitude, destination, "
                 + "destination_latitude, destination_longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = con.prepareStatement(sql, new String[] {"id"})) {
             ps.setInt(1, v.getPartnerId());
             ps.setString(2, v.getVehicleType().name());
             ps.setString(3, v.getVehicleNumber());
@@ -43,9 +42,6 @@ public class VehicleDAOImpl implements VehicleDAO {
             ps.executeUpdate();
             return JdbcHelper.generatedId(ps);
         } catch (SQLException e) {
-            if ("23000".equals(e.getSQLState())) {
-                throw new DataAccessException("A vehicle with this number is already registered.", e);
-            }
             throw new DataAccessException("Could not save vehicle", e);
         }
     }
@@ -80,8 +76,17 @@ public class VehicleDAOImpl implements VehicleDAO {
 
     @Override
     public void updateRoute(int vehicleId, String destination, Double latitude, Double longitude) {
-        update("UPDATE vehicles SET destination = ?, destination_latitude = ?, destination_longitude = ? WHERE id = ?",
-                destination, latitude, longitude, vehicleId);
+        String sql = "UPDATE vehicles SET destination = ?, destination_latitude = ?, destination_longitude = ? WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, destination);
+            JdbcHelper.setNullableDouble(ps, 2, latitude);
+            JdbcHelper.setNullableDouble(ps, 3, longitude);
+            ps.setInt(4, vehicleId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Could not update vehicle", e);
+        }
     }
 
     @Override

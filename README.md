@@ -4,15 +4,17 @@ Smart goods delivery matching. Customers who want to send goods are matched with
 partners (Bike, Auto, Truck) that have free capacity, are close to the pickup point and are
 already heading in a compatible direction.
 
-**Stack:** Java 25, Maven, Jakarta Servlet 6.1, JSP + JSTL, JDBC, MySQL 8, Apache Tomcat 11.
+**Stack:** Java 25, Maven, Jakarta Servlet 6.1, JSP + JSTL, JDBC, PostgreSQL (pgAdmin 4), Apache Tomcat 11.
 No frameworks, no paid map APIs.
 
 ## Run it in IntelliJ IDEA
 
-1. **MySQL:** open MySQL Workbench (or the `mysql` command line) and run, in order:
-   - `database/schema.sql` (creates the `emptymiles` database and tables)
-   - `database/seed-data.sql` (demo accounts and vehicles in Chennai)
-2. **DB password:** edit `src/main/resources/db.properties` and set `db.password` to your MySQL root password.
+1. **PostgreSQL (pgAdmin 4):**
+   - Right-click *Databases* > *Create* > *Database...* and name it `emptymiles`.
+   - Select `emptymiles`, open *Tools* > *Query Tool*, then open and run (F5), in order:
+     `database/schema.sql` (tables) and `database/seed-data.sql` (demo accounts and vehicles in Chennai).
+2. **DB password:** edit `src/main/resources/db.properties` and set `db.password` to your PostgreSQL password
+   (the one you use to log in to the server in pgAdmin). Don't commit your real password to GitHub.
 3. **Maven:** right-click `pom.xml` > *Maven* > *Reload project* so the dependencies download.
 4. **Tomcat 11:** download Tomcat 11 (zip) from tomcat.apache.org and unzip it anywhere.
    In IntelliJ: *Run* > *Edit Configurations* > *+* > *Tomcat Server* > *Local*.
@@ -60,7 +62,7 @@ service       business rules and the booking workflow
         |
 dao           SQL with JDBC PreparedStatements
         |
-MySQL
+PostgreSQL
 ```
 
 | Package | Responsibility |

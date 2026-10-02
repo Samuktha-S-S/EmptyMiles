@@ -11,7 +11,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class BookingDAOImpl implements BookingDAO {
         String sql = "INSERT INTO bookings (shipment_id, customer_id, partner_id, vehicle_id, status, match_score, "
                 + "estimated_cost) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = con.prepareStatement(sql, new String[] {"id"})) {
             ps.setInt(1, b.getShipmentId());
             ps.setInt(2, b.getCustomerId());
             ps.setInt(3, b.getPartnerId());
