@@ -1,0 +1,22 @@
+/* Login and register pages */
+.auth-page {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px;
+    background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+}
+.auth-card {
+    width: 100%; max-width: 440px; background: #fff; border-radius: 14px; padding: 32px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, .2);
+}
+.auth-card .brand { text-align: center; font-size: 2rem; }
+.tagline { text-align: center; color: var(--muted); margin: 4px 0 24px; }
+.switch { text-align: center; margin-top: 16px; }
+
+.role-choice { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.radio-card { margin: 0; cursor: pointer; }
+.radio-card input { display: none; }
+.radio-card span {
+    display: block; border: 2px solid var(--border); border-radius: 10px; padding: 12px;
+    text-align: center; font-size: .9rem;
+}
+.radio-card small { color: var(--muted); }
+.radio-card input:checked + span { border-color: var(--primary); background: #f0fdfa; }
