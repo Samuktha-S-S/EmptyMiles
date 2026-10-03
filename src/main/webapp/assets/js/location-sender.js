@@ -9,6 +9,7 @@
     const intervalMs = parseInt(box.dataset.interval, 10) * 1000;
     const statusEl = document.getElementById('shareStatus');
     const toggle = document.getElementById('shareToggle');
+    const live = document.getElementById('shareLive');
     let timer = null;
 
     function send() {
@@ -40,6 +41,7 @@
         send();
         timer = setInterval(send, intervalMs);
         toggle.textContent = 'Pause sharing';
+        if (live) live.hidden = false;
     }
 
     function stop() {
@@ -47,6 +49,7 @@
         timer = null;
         statusEl.textContent = 'Paused';
         toggle.textContent = 'Resume sharing';
+        if (live) live.hidden = true;
     }
 
     toggle.addEventListener('click', function () {

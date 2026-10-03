@@ -6,6 +6,12 @@
 
     <display-name>EmptyMiles</display-name>
 
+    <!-- Number formatting (fmt:formatNumber) always uses Indian English, whatever the browser's language -->
+    <context-param>
+        <param-name>jakarta.servlet.jsp.jstl.fmt.locale</param-name>
+        <param-value>en-IN</param-value>
+    </context-param>
+
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>

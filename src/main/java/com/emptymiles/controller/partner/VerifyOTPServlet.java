@@ -23,7 +23,7 @@ public class VerifyOTPServlet extends BaseServlet {
             bookingService.verifyOtp(currentUser(req).getId(), bookingId, req.getParameter("otp"));
             flash(req, "OTP verified. Package delivered.");
         } catch (BookingException e) {
-            flash(req, e.getMessage());
+            flashError(req, e.getMessage());
         }
         redirect(req, resp, "/partner/delivery?id=" + bookingId);
     }

@@ -2,6 +2,7 @@ package com.emptymiles.model;
 
 import com.emptymiles.model.enums.DeliveryStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /** Goods a customer wants to send (table: shipments). */
@@ -21,6 +22,15 @@ public class Shipment {
     private double weight;   // total kg
     private DeliveryStatus status;
     private LocalDateTime createdAt;
+
+    // Optional package and schedule details (null when the customer left them empty)
+    private Double lengthCm;
+    private Double widthCm;
+    private Double heightCm;
+    private String specialRequirements;
+    private LocalDate pickupDate;
+    private String pickupTimeSlot;
+    private String specialInstructions;
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -63,6 +73,31 @@ public class Shipment {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public Double getLengthCm() { return lengthCm; }
+    public void setLengthCm(Double lengthCm) { this.lengthCm = lengthCm; }
+
+    public Double getWidthCm() { return widthCm; }
+    public void setWidthCm(Double widthCm) { this.widthCm = widthCm; }
+
+    public Double getHeightCm() { return heightCm; }
+    public void setHeightCm(Double heightCm) { this.heightCm = heightCm; }
+
+    public String getSpecialRequirements() { return specialRequirements; }
+    public void setSpecialRequirements(String specialRequirements) { this.specialRequirements = specialRequirements; }
+
+    public LocalDate getPickupDate() { return pickupDate; }
+    public void setPickupDate(LocalDate pickupDate) { this.pickupDate = pickupDate; }
+
+    public String getPickupTimeSlot() { return pickupTimeSlot; }
+    public void setPickupTimeSlot(String pickupTimeSlot) { this.pickupTimeSlot = pickupTimeSlot; }
+
+    public String getSpecialInstructions() { return specialInstructions; }
+    public void setSpecialInstructions(String specialInstructions) { this.specialInstructions = specialInstructions; }
+
+    public boolean hasDimensions() {
+        return lengthCm != null && widthCm != null && heightCm != null;
+    }
 
     /** A shipment can be searched/booked again only while it has no live booking. */
     public boolean isOpenForBooking() {

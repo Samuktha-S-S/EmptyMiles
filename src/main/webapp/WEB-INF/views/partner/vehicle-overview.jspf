@@ -1,0 +1,25 @@
+<%-- Overview of one vehicle. Statically included inside <c:forEach var="v">. --%>
+<c:set var="vt" value="${fn:toLowerCase(v.vehicleType)}"/>
+<div class="vehicle-overview">
+    <span class="vo-figure"><svg class="i"><use href="${ico}#${vt}"/></svg></span>
+    <div>
+        <div class="row-flex">
+            <h3 style="font-size:18px;text-transform:capitalize">${vt}</h3>
+            <span class="reg-plate"><c:out value="${v.vehicleNumber}"/></span>
+            <span class="badge vstatus-${v.status}">${v.status == 'AVAILABLE' ? 'Available' : (v.status == 'BUSY' ? 'Full' : 'Offline')}</span>
+        </div>
+        <div class="vo-stats">
+            <div><div class="k">Capacity</div><div class="v"><fmt:formatNumber value="${v.totalCapacity}" maxFractionDigits="2"/> kg</div></div>
+            <div><div class="k">Current load</div><div class="v"><fmt:formatNumber value="${v.currentLoad}" maxFractionDigits="2"/> kg</div></div>
+            <div><div class="k">Available</div><div class="v" style="color:var(--teal-700)"><fmt:formatNumber value="${v.availableCapacity}" maxFractionDigits="2"/> kg</div></div>
+            <div><div class="k">Heading to</div><div class="v" style="font-size:14px">${empty v.destination ? 'No fixed route' : ''}<c:out value="${v.destination}"/></div></div>
+        </div>
+        <div class="bar ${v.availableCapacity <= 0 ? 'amber' : ''}" style="margin-top:12px" title="Load">
+            <span style="width:${v.totalCapacity > 0 ? (v.currentLoad * 100 / v.totalCapacity) : 0}%"></span>
+        </div>
+        <c:if test="${not v.hasLocation()}">
+            <p class="small" style="color:var(--amber-700);margin-top:8px">Share this vehicle's location before going available.
+                <a href="${ctx}/partner/location">Set location</a></p>
+        </c:if>
+    </div>
+</div>

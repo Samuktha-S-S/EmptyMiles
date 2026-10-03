@@ -24,6 +24,11 @@ public final class AppConstants {
     public static final String VIEW_VEHICLE_MANAGEMENT = VIEWS + "partner/vehicle-management.jsp";
     public static final String VIEW_BOOKING_REQUESTS = VIEWS + "partner/booking-requests.jsp";
     public static final String VIEW_ACTIVE_DELIVERY = VIEWS + "partner/active-delivery.jsp";
+    public static final String VIEW_CUSTOMER_SHIPMENTS = VIEWS + "customer/shipments.jsp";
+    public static final String VIEW_MATCHING_SHIPMENTS = VIEWS + "partner/matching-shipments.jsp";
+    public static final String VIEW_LOCATION = VIEWS + "partner/location.jsp";
+    public static final String VIEW_PROFILE = VIEWS + "common/profile.jsp";
+    public static final String VIEW_HELP = VIEWS + "common/help.jsp";
     public static final String VIEW_ERROR = VIEWS + "common/error.jsp";
     public static final String VIEW_SUCCESS = VIEWS + "common/success.jsp";
 

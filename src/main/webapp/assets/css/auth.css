@@ -1,22 +1,60 @@
-/* Login and register pages */
-.auth-page {
-    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px;
-    background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
-}
-.auth-card {
-    width: 100%; max-width: 440px; background: #fff; border-radius: 14px; padding: 32px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, .2);
-}
-.auth-card .brand { text-align: center; font-size: 2rem; }
-.tagline { text-align: center; color: var(--muted); margin: 4px 0 24px; }
-.switch { text-align: center; margin-top: 16px; }
+/* Login and register: brand panel on the left, form on the right. */
+.auth-page { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: var(--surface); }
 
-.role-choice { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-.radio-card { margin: 0; cursor: pointer; }
-.radio-card input { display: none; }
-.radio-card span {
-    display: block; border: 2px solid var(--border); border-radius: 10px; padding: 12px;
-    text-align: center; font-size: .9rem;
+.auth-brand {
+    position: relative; overflow: hidden;
+    background: var(--navy-950); color: #c7d2e3;
+    padding: 40px 48px; display: flex; flex-direction: column;
 }
-.radio-card small { color: var(--muted); }
-.radio-card input:checked + span { border-color: var(--primary); background: #f0fdfa; }
+.auth-brand::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255, 255, 255, .04) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px);
+    background-size: 36px 36px;
+}
+.auth-brand > * { position: relative; }
+.auth-brand .brand { padding: 0; }
+.auth-pitch { margin-top: auto; margin-bottom: auto; max-width: 440px; padding: 40px 0; }
+.auth-pitch h1 { color: #fff; font-size: 34px; line-height: 1.15; letter-spacing: -.02em; }
+.auth-pitch h1 span { color: var(--teal-500); }
+.auth-pitch p { margin-top: 14px; font-size: 15px; color: #9fb0cc; }
+.auth-points { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; }
+.auth-points li { display: flex; gap: 12px; align-items: flex-start; }
+.auth-points .pi { width: 34px; height: 34px; border-radius: 10px; background: rgba(20, 184, 166, .14); color: var(--teal-500); display: grid; place-items: center; flex: none; }
+.auth-points b { color: #fff; display: block; font-size: 14px; }
+.auth-points small { color: #8fa2c2; font-size: 13px; }
+.auth-journey { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #6f82a3; }
+.auth-journey .i { width: 14px; height: 14px; }
+
+.auth-main { display: flex; align-items: center; justify-content: center; padding: 40px 24px; background: var(--bg); }
+.auth-card { width: 100%; max-width: 420px; }
+.auth-card h2 { font-size: 24px; }
+.auth-card .lead { color: var(--text-2); margin: 6px 0 24px; }
+.auth-card .switch { text-align: center; margin-top: 20px; color: var(--text-2); }
+.auth-card .switch a { font-weight: 600; }
+.auth-card .demo { margin-top: 22px; padding: 12px 14px; border: 1px dashed var(--border-strong); border-radius: 10px; font-size: 12.5px; color: var(--text-2); }
+.auth-mobile-brand { display: none; }
+
+.role-choice { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+.radio-card { position: relative; cursor: pointer; }
+.radio-card input { position: absolute; opacity: 0; }
+.radio-card .rc {
+    display: flex; flex-direction: column; gap: 8px; height: 100%;
+    padding: 14px; border: 1.5px solid var(--border-strong); border-radius: 12px; background: var(--surface);
+    transition: border-color .15s, background-color .15s;
+}
+.radio-card .rc .i { width: 22px; height: 22px; color: var(--text-3); }
+.radio-card .rc b { font-size: 14px; }
+.radio-card .rc small { color: var(--text-3); font-size: 12.5px; }
+.radio-card:hover .rc { border-color: var(--text-3); }
+.radio-card input:checked + .rc { border-color: var(--teal-600); background: var(--teal-50); }
+.radio-card input:checked + .rc .i { color: var(--teal-700); }
+.radio-card input:focus-visible + .rc { box-shadow: var(--ring); }
+
+@media (max-width: 900px) {
+    .auth-page { grid-template-columns: 1fr; }
+    .auth-brand { display: none; }
+    .auth-mobile-brand { display: flex; justify-content: center; margin-bottom: 24px; }
+    .auth-mobile-brand .brand { color: var(--navy-900); padding: 0; }
+    .auth-main { align-items: flex-start; padding-top: 48px; }
+}

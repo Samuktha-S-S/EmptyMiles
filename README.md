@@ -13,6 +13,8 @@ No frameworks, no paid map APIs.
    - Right-click *Databases* > *Create* > *Database...* and name it `emptymiles`.
    - Select `emptymiles`, open *Tools* > *Query Tool*, then open and run (F5), in order:
      `database/schema.sql` (tables) and `database/seed-data.sql` (demo accounts and vehicles in Chennai).
+   - **Already created the tables before the UI redesign?** Run `database/upgrade-shipment-details.sql` once.
+     It adds the optional dimensions, pickup date/time and instructions columns used by the Send Goods steps.
 2. **DB password:** edit `src/main/resources/db.properties` and set `db.password` to your PostgreSQL password
    (the one you use to log in to the server in pgAdmin). Don't commit your real password to GitHub.
 3. **Maven:** right-click `pom.xml` > *Maven* > *Reload project* so the dependencies download.
@@ -36,17 +38,34 @@ No frameworks, no paid map APIs.
 
 ## Demo walkthrough
 
-1. Log in as the customer, click **Send goods**: Clothes, 5 kg, pickup T. Nagar
-   (13.0418, 80.2341), destination Adyar (13.0012, 80.2565). Click **Search suitable vehicles**.
-2. Ravi's bike ranks first (0.2 km away, already going to Adyar). The truck is left out because
-   T. Nagar to Adyar is far off its Velachery to Tambaram route. Click **Select**.
-3. In another browser (or a private window) log in as `ravi@emptymiles.com`, open **Requests**, **Accept**.
+1. Log in as the customer and click **Create Shipment**. Step 1 *Package*: Clothes, 5 kg.
+   Step 2 *Route*: pickup T. Nagar (13.0418, 80.2341), destination Adyar (13.0012, 80.2565).
+   Step 3 *Schedule* is optional. Step 4 *Review*, then **Confirm Shipment** and **Continue to Find Vehicles**.
+2. Ravi's bike ranks first (0.2 km away, already going to Adyar), with the reasons it matches.
+   The truck is left out because T. Nagar to Adyar is far off its Velachery to Tambaram route.
+   Click **Request Booking** and confirm.
+3. In another browser (or a private window) log in as `ravi@emptymiles.com`, open **Booking Requests**, **Accept**.
    The bike's load goes from 3 kg to 8 kg and an OTP is created.
-4. The customer now sees the 4-digit OTP on the booking page and can open **Track delivery**.
-5. The partner presses the status button step by step (on the way, at pickup, picked up, in transit,
+4. The customer now sees the 4-digit OTP on the booking page and can open **Track Delivery**.
+5. The partner presses the next-step button (partner arriving, at pickup, picked up, in transit,
    arrived). The browser shares the partner's GPS location every 15 seconds while the page is open.
 6. At *Arrived at destination* the partner types the customer's OTP, then **Complete delivery**.
    The bike's load goes back to 3 kg.
+
+## Pages
+
+| Customer | Partner |
+|---|---|
+| Dashboard (`/customer/dashboard`) | Dashboard (`/partner/dashboard`) |
+| Send Goods, 4 steps (`/customer/shipment/new`) | My Vehicle (`/partner/vehicles`) |
+| My Shipments (`/customer/shipments`) | Matching Shipments, read-only (`/partner/matching-shipments`) |
+| Find Vehicles (`/customer/find-vehicles`, then `/customer/matches?shipmentId=`) | Booking Requests (`/partner/requests`) |
+| Track Delivery (`/customer/track`, then `/customer/tracking?id=`) | Active Deliveries and OTP (`/partner/delivery`) |
+| Profile (`/customer/profile`) | Location and route (`/partner/location`), Profile (`/partner/profile`) |
+
+Help (`/help`) is shared. Styles live in `assets/css` (`style.css` holds the design tokens and components),
+icons in `assets/images/icons.svg`, and the route picture is drawn by `assets/js/route-map.js` from the stored
+coordinates, so no map API key is needed.
 
 ## How it is built
 

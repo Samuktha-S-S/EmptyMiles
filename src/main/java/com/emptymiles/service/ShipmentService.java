@@ -25,7 +25,9 @@ public class ShipmentService {
     public Shipment createShipment(int customerId,
                                    String pickupAddress, String pickupLat, String pickupLng,
                                    String destinationAddress, String destinationLat, String destinationLng,
-                                   String productName, String productType, String quantity, String weight) {
+                                   String productName, String productType, String quantity, String weight,
+                                   String lengthCm, String widthCm, String heightCm, String specialRequirements,
+                                   String pickupDate, String pickupTimeSlot, String specialInstructions) {
         Shipment s = new Shipment();
         s.setCustomerId(customerId);
         s.setPickupAddress(ValidationUtil.requireText(pickupAddress, "Pickup address"));
@@ -38,6 +40,13 @@ public class ShipmentService {
         s.setProductType(ValidationUtil.requireText(productType, "Product type"));
         s.setQuantity(ValidationUtil.requirePositiveInt(quantity, "Quantity"));
         s.setWeight(ValidationUtil.requirePositive(weight, "Weight"));
+        s.setLengthCm(ValidationUtil.optionalPositive(lengthCm, "Length"));
+        s.setWidthCm(ValidationUtil.optionalPositive(widthCm, "Width"));
+        s.setHeightCm(ValidationUtil.optionalPositive(heightCm, "Height"));
+        s.setSpecialRequirements(ValidationUtil.optionalText(specialRequirements, "Special requirements", 255));
+        s.setPickupDate(ValidationUtil.optionalFutureDate(pickupDate, "Pickup date"));
+        s.setPickupTimeSlot(ValidationUtil.optionalText(pickupTimeSlot, "Preferred pickup time", 20));
+        s.setSpecialInstructions(ValidationUtil.optionalText(specialInstructions, "Special instructions", 500));
         s.setStatus(DeliveryStatus.REQUESTED);
         s.setId(shipmentDAO.create(s));
         return s;
@@ -62,6 +71,11 @@ public class ShipmentService {
             shipmentDAO.updateStatus(shipment.getId(), DeliveryStatus.SEARCHING);
             shipment.setStatus(DeliveryStatus.SEARCHING);
         }
+    }
+
+    /** Shipments still waiting for a vehicle, from every customer (used by the partner's matching view). */
+    public List<Shipment> getOpenShipments() {
+        return shipmentDAO.findOpen();
     }
 
     void updateStatus(int shipmentId, DeliveryStatus status) {
