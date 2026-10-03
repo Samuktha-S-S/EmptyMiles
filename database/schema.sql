@@ -49,7 +49,15 @@ CREATE TABLE IF NOT EXISTS shipments (
     quantity               INT NOT NULL,
     weight                 NUMERIC(10, 2) NOT NULL,          -- total kg
     status                 VARCHAR(30) NOT NULL DEFAULT 'REQUESTED',
-    created_at             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- Optional details from the Send Goods steps
+    length_cm              NUMERIC(8, 2),
+    width_cm               NUMERIC(8, 2),
+    height_cm              NUMERIC(8, 2),
+    special_requirements   VARCHAR(255),
+    pickup_date            DATE,
+    pickup_time_slot       VARCHAR(20),
+    special_instructions   VARCHAR(500)
 );
 
 -- A shipment assigned to one partner's vehicle

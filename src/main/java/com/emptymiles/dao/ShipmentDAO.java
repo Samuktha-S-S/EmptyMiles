@@ -14,5 +14,8 @@ public interface ShipmentDAO {
 
     List<Shipment> findByCustomerId(int customerId);
 
+    /** Shipments still waiting for a vehicle (REQUESTED or SEARCHING), newest first. */
+    List<Shipment> findOpen();
+
     void updateStatus(int shipmentId, DeliveryStatus status);
 }

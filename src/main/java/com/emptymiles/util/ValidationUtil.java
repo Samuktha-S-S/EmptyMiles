@@ -2,6 +2,8 @@ package com.emptymiles.util;
 
 import com.emptymiles.exception.ValidationException;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.regex.Pattern;
 
 /** Input checks shared by the services. Each method throws ValidationException with a readable message. */
@@ -87,6 +89,43 @@ public final class ValidationUtil {
             return null;
         }
         return parseDouble(value, field);
+    }
+
+    /** Trimmed text, or null for an empty optional field. */
+    public static String optionalText(String value, String field, int maxLength) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        String text = value.trim();
+        if (text.length() > maxLength) {
+            throw new ValidationException(field + " must be at most " + maxLength + " characters.");
+        }
+        return text;
+    }
+
+    /** A number greater than 0, or null for an empty optional field. */
+    public static Double optionalPositive(String value, String field) {
+        Double number = optionalDouble(value, field);
+        if (number != null && number <= 0) {
+            throw new ValidationException(field + " must be greater than 0.");
+        }
+        return number;
+    }
+
+    /** A yyyy-MM-dd date that is today or later, or null for an empty optional field. */
+    public static LocalDate optionalFutureDate(String value, String field) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            LocalDate date = LocalDate.parse(value.trim());
+            if (date.isBefore(LocalDate.now())) {
+                throw new ValidationException(field + " cannot be in the past.");
+            }
+            return date;
+        } catch (DateTimeParseException e) {
+            throw new ValidationException(field + " is not a valid date.");
+        }
     }
 
     public static int parseId(String value, String field) {

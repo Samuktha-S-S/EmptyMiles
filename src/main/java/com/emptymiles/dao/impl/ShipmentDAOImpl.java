@@ -7,6 +7,7 @@ import com.emptymiles.model.enums.DeliveryStatus;
 import com.emptymiles.util.DBConnection;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,7 +20,8 @@ public class ShipmentDAOImpl implements ShipmentDAO {
     public int create(Shipment s) {
         String sql = "INSERT INTO shipments (customer_id, pickup_address, pickup_latitude, pickup_longitude, "
                 + "destination_address, destination_latitude, destination_longitude, product_name, product_type, "
-                + "quantity, weight, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "quantity, weight, status, length_cm, width_cm, height_cm, special_requirements, pickup_date, "
+                + "pickup_time_slot, special_instructions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, new String[] {"id"})) {
             ps.setInt(1, s.getCustomerId());
@@ -34,6 +36,13 @@ public class ShipmentDAOImpl implements ShipmentDAO {
             ps.setInt(10, s.getQuantity());
             ps.setDouble(11, s.getWeight());
             ps.setString(12, s.getStatus().name());
+            JdbcHelper.setNullableDouble(ps, 13, s.getLengthCm());
+            JdbcHelper.setNullableDouble(ps, 14, s.getWidthCm());
+            JdbcHelper.setNullableDouble(ps, 15, s.getHeightCm());
+            ps.setString(16, s.getSpecialRequirements());
+            ps.setDate(17, s.getPickupDate() == null ? null : Date.valueOf(s.getPickupDate()));
+            ps.setString(18, s.getPickupTimeSlot());
+            ps.setString(19, s.getSpecialInstructions());
             ps.executeUpdate();
             return JdbcHelper.generatedId(ps);
         } catch (SQLException e) {
@@ -50,6 +59,22 @@ public class ShipmentDAOImpl implements ShipmentDAO {
     @Override
     public List<Shipment> findByCustomerId(int customerId) {
         return query("SELECT * FROM shipments WHERE customer_id = ? ORDER BY created_at DESC, id DESC", customerId);
+    }
+
+    @Override
+    public List<Shipment> findOpen() {
+        List<Shipment> shipments = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                     "SELECT * FROM shipments WHERE status IN ('REQUESTED', 'SEARCHING') ORDER BY created_at DESC, id DESC");
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                shipments.add(map(rs));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Could not load shipments", e);
+        }
+        return shipments;
     }
 
     @Override
@@ -96,6 +121,14 @@ public class ShipmentDAOImpl implements ShipmentDAO {
         s.setWeight(rs.getDouble("weight"));
         s.setStatus(DeliveryStatus.valueOf(rs.getString("status")));
         s.setCreatedAt(JdbcHelper.getDateTime(rs, "created_at"));
+        s.setLengthCm(JdbcHelper.getNullableDouble(rs, "length_cm"));
+        s.setWidthCm(JdbcHelper.getNullableDouble(rs, "width_cm"));
+        s.setHeightCm(JdbcHelper.getNullableDouble(rs, "height_cm"));
+        s.setSpecialRequirements(rs.getString("special_requirements"));
+        Date pickupDate = rs.getDate("pickup_date");
+        s.setPickupDate(pickupDate == null ? null : pickupDate.toLocalDate());
+        s.setPickupTimeSlot(rs.getString("pickup_time_slot"));
+        s.setSpecialInstructions(rs.getString("special_instructions"));
         return s;
     }
 }

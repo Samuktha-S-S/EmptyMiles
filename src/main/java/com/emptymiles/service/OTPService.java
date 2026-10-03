@@ -45,7 +45,7 @@ public class OTPService {
             throw new BookingException("OTP was already verified.");
         }
         if (enteredOtp == null || !otp.getOtp().equals(enteredOtp.trim())) {
-            throw new BookingException("Wrong OTP. Ask the customer for the 4-digit code shown in their booking.");
+            throw new BookingException("Incorrect OTP. Please try again. Ask the customer for the 4-digit code shown on their booking.");
         }
         otpDAO.markVerified(otp.getId());
     }

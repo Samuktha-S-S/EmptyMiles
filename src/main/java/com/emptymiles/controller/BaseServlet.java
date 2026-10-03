@@ -52,6 +52,11 @@ public abstract class BaseServlet extends HttpServlet {
         req.getSession().setAttribute("flash", message);
     }
 
+    /** Like flash(), but shown as an error. */
+    protected void flashError(HttpServletRequest req, String message) {
+        req.getSession().setAttribute("flashError", message);
+    }
+
     protected void showError(HttpServletRequest req, HttpServletResponse resp, String message)
             throws ServletException, IOException {
         req.setAttribute(AppConstants.ATTR_ERROR, message);

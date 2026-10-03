@@ -16,8 +16,9 @@ import java.io.IOException;
 /**
  * Add vehicles and change their availability, location and route.
  * The form's hidden "action" field says which change to make.
+ * /partner/vehicles shows the vehicles; /partner/location shows the location and route forms.
  */
-@WebServlet("/partner/vehicles")
+@WebServlet({"/partner/vehicles", "/partner/location"})
 public class VehicleManagementServlet extends BaseServlet {
 
     private final VehicleService vehicleService = new VehicleService();
@@ -25,7 +26,8 @@ public class VehicleManagementServlet extends BaseServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setAttribute("vehicles", vehicleService.getVehiclesForPartner(currentUser(req).getId()));
-        forward(req, resp, AppConstants.VIEW_VEHICLE_MANAGEMENT);
+        forward(req, resp, req.getServletPath().equals("/partner/location")
+                ? AppConstants.VIEW_LOCATION : AppConstants.VIEW_VEHICLE_MANAGEMENT);
     }
 
     @Override
@@ -56,7 +58,7 @@ public class VehicleManagementServlet extends BaseServlet {
                 }
                 flash(req, "Vehicle updated.");
             }
-            redirect(req, resp, "/partner/vehicles");
+            redirect(req, resp, req.getServletPath());
         } catch (ValidationException e) {
             req.setAttribute(AppConstants.ATTR_ERROR, e.getMessage());
             doGet(req, resp);

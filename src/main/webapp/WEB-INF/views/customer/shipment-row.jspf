@@ -1,0 +1,32 @@
+<%-- One shipment row. Statically included inside <c:forEach var="s">; needs bookingByShipment. --%>
+<c:set var="b" value="${bookingByShipment[s.id]}"/>
+<c:set var="stage" value="${s.status.stage}"/>
+<tr data-group="${stage == 'Pending' or stage == 'Matched' ? 'pending' : (stage == 'Confirmed' or stage == 'In Transit' ? 'active' : 'done')}">
+    <td data-label="Product">
+        <div class="cell-main"><c:out value="${s.productName}"/></div>
+        <div class="cell-sub">#${s.id} &middot; <c:out value="${s.productType}"/></div>
+    </td>
+    <td data-label="Quantity" class="mono">${s.quantity}</td>
+    <td data-label="Weight" class="mono nowrap"><fmt:formatNumber value="${s.weight}" maxFractionDigits="2"/> kg</td>
+    <td data-label="Pickup" class="cell-place" title="<c:out value='${s.pickupAddress}'/>"><c:out value="${s.pickupAddress}"/></td>
+    <td data-label="Destination" class="cell-place" title="<c:out value='${s.destinationAddress}'/>"><c:out value="${s.destinationAddress}"/></td>
+    <td data-label="Created" class="nowrap">${s.createdAt.format(df)}<div class="cell-sub">${s.createdAt.format(tf)}</div></td>
+    <td data-label="Status"><span class="badge tone-${s.status.tone}" title="${s.status.label}">${stage}</span></td>
+    <td class="actions">
+        <c:choose>
+            <c:when test="${stage == 'Pending'}">
+                <a class="btn btn-sm btn-primary" data-loading href="${ctx}/customer/matches?shipmentId=${s.id}"><svg class="i"><use href="${ico}#search"/></svg><span>Find Vehicles</span></a>
+            </c:when>
+            <c:when test="${empty b}"></c:when>
+            <c:when test="${stage == 'Matched'}">
+                <a class="btn btn-sm btn-outline" href="${ctx}/customer/booking?id=${b.id}"><span>View Match</span></a>
+            </c:when>
+            <c:when test="${stage == 'Confirmed' or stage == 'In Transit'}">
+                <a class="btn btn-sm btn-navy" href="${ctx}/customer/tracking?id=${b.id}"><svg class="i"><use href="${ico}#pin"/></svg><span>Track</span></a>
+            </c:when>
+            <c:otherwise>
+                <a class="btn btn-sm btn-outline" href="${ctx}/customer/booking?id=${b.id}"><span>View Details</span></a>
+            </c:otherwise>
+        </c:choose>
+    </td>
+</tr>
